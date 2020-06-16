@@ -38,9 +38,9 @@ export const ListItem = styled.div`
       position: absolute;
       right: 2px;
       top: 2px;
-      font-size: ${style ["font-size-s"]};
+      font-size: ${style["font-size-s"]};
       line-height: 15px;
-      color: ${style ["font-color-light"]};
+      color: ${style["font-color-light"]};
       .play {
         vertical-align: top;
       }
@@ -58,8 +58,8 @@ export const ListItem = styled.div`
       padding: 0 2px;
       height: 50px;
       text-align: left;
-      font-size: ${style ["font-size-s"]};
+      font-size: ${style["font-size-s"]};
       line-height: 1.4;
-      color: ${style ["font-color-desc"]};
+      color: ${style["font-color-desc"]};
     }
 `;
