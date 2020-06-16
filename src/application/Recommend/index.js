@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { forwardRef, useState,useEffect, useRef, useImperativeHandle } from 'react'
 import Slider from '../../components/Slider'
 import RecommendList from '../../components/List'
+import Scroll from '../../baseUI/Scroll/index'
+import { Content } from './style'
 
 function Recommend (props) {
   //mock 数据
@@ -18,10 +20,14 @@ function Recommend (props) {
   })
 
   return (
-    <div>
-      <Slider bannerList={bannerList}></Slider>
-      <RecommendList recommendList={recommendList}></RecommendList> 
-    </div>
+    <Content>
+      <Scroll className="list">
+        <div>
+          <Slider bannerList={bannerList}></Slider>
+          <RecommendList recommendList={recommendList}></RecommendList> 
+        </div>
+      </Scroll>
+    </Content>
   )
 }
 
