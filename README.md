@@ -1,4 +1,4 @@
-# react hooks+redux+immutable.js 仿网易云音乐h5
+# react hooks+redux+immutable.js 仿网易云音乐
 
 打开方式:
 1. 将项目 clone 下来
