@@ -5,10 +5,11 @@ import {forceCheck} from 'react-lazyload'
 import * as actionTypes from './store/actionCreators'
 import RecommendList from '../../components/List'
 import Scroll from '../../baseUI/Scroll/index'
+import Loading from '../../baseUI/Loading/index'
 import { Content } from './style'
 
 function Recommend (props) {
-  const { bannerList, recommendList } = props
+  const { bannerList, recommendList, enterLoading } = props
   const { getBannerDataDispatch, getRecommendListDataDispatch } = props
   useEffect (() => {
     getBannerDataDispatch ()
@@ -25,6 +26,7 @@ function Recommend (props) {
           <RecommendList recommendList={recommendListJS}></RecommendList> 
         </div>
       </Scroll>
+      { enterLoading ? <Loading></Loading> : null}
     </Content>
   )
 }
@@ -34,6 +36,7 @@ const mapStateToProps = (state) => ({
   // 不然每次 diff 比对 props 的时候都是不一样的引用，还是导致不必要的重渲染，属于滥用 immutable
   bannerList: state.getIn (['recommend', 'bannerList']),
   recommendList: state.getIn (['recommend', 'recommendList']),
+  enterLoading: state.getIn (['recommend', 'enterLoading'])
 })
 // 映射 dispatch 到 props 上
 const mapDispatchToProps = (dispatch) => {
