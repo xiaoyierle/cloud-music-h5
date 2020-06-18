@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Horizen from '../../baseUI/HorizenItem'
 import Scroll from '../../baseUI/Scroll'
 import { categoryTypes, alphaTypes } from '../../api/config'
+import { CHANGE_CATEGORY, CHANGE_ALPHA, Data, CategoryDataContext } from './data'
 import { 
   NavContainer,
   ListContainer,
@@ -23,23 +24,24 @@ import Loading from '../../baseUI/Loading'
 import  LazyLoad, {forceCheck} from 'react-lazyload'
 
 function Singers (props) {
-  let [category, setCategory] = useState ('')
-  let [alpha, setAlpha] = useState ('')
+  const {data, dispatch} = useContext (CategoryDataContext)
+  const {category, alpha} = data.toJS()
 
   const { singerList, enterLoading, pullUpLoading, pullDownLoading, pageCount } = props
   const { getHotSingerDispatch, updateDispatch, pullDownRefreshDispatch, pullUpRefreshDispatch } = props
 
   useEffect(() => {
-    getHotSingerDispatch();
-    // eslint-disable-next-line
+    if (!singerList.size) {
+      getHotSingerDispatch ()
+    }
   }, [])
 
   let handleUpdateAlpha = (val) => {
-    setAlpha (val)
+    dispatch ({type: CHANGE_ALPHA, data: val})
     updateDispatch(category, val)
   }
   let handleUpdateCatetory = (val) => {
-    setCategory (val)
+    dispatch ({type: CHANGE_CATEGORY, data: val})
     updateDispatch(val, alpha)
   }
 
@@ -76,32 +78,34 @@ function Singers (props) {
   
   return (
     <div>
-      <NavContainer>
-        <Horizen 
-          list={categoryTypes} 
-          title={"分类 (默认热门):"}
-          handleClick={handleUpdateCatetory} 
-          oldVal={category}
-        />
-        <Horizen 
-          list={alphaTypes} 
-          title={"首字母:"}
-          handleClick={handleUpdateAlpha} 
-          oldVal={alpha}
-        />
-      </NavContainer>
-      <ListContainer>
-        <Scroll
-          pullUp={ handlePullUp }
-          pullDown = { handlePullDown }
-          pullUpLoading = { pullUpLoading }
-          pullDownLoading = { pullDownLoading }
-          onScroll={forceCheck}
-        >
-          { renderSingerList () }
-        </Scroll>
-        <Loading show={enterLoading}></Loading>
-      </ListContainer>
+      <Data>
+        <NavContainer>
+          <Horizen 
+            list={categoryTypes} 
+            title={"分类 (默认热门):"}
+            handleClick={handleUpdateCatetory} 
+            oldVal={category}
+          />
+          <Horizen 
+            list={alphaTypes} 
+            title={"首字母:"}
+            handleClick={handleUpdateAlpha} 
+            oldVal={alpha}
+          />
+        </NavContainer>
+        <ListContainer>
+          <Scroll
+            pullUp={ handlePullUp }
+            pullDown = { handlePullDown }
+            pullUpLoading = { pullUpLoading }
+            pullDownLoading = { pullDownLoading }
+            onScroll={forceCheck}
+          >
+            { renderSingerList () }
+          </Scroll>
+          <Loading show={enterLoading}></Loading>
+        </ListContainer>
+      </Data>
     </div>
   )
 }

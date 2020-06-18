@@ -6,6 +6,7 @@ import { IconStyle } from './assets/iconfont/iconfont'
 import store from './store/index'
 import routes from './routes/index.js'
 import { HashRouter } from 'react-router-dom'
+import { Data } from './application/Singers/data'
 
 class App extends Component {
   render() {
@@ -15,7 +16,9 @@ class App extends Component {
         <HashRouter>
           <GlobalStyle></GlobalStyle>
           <IconStyle></IconStyle>
-          { renderRoutes (routes) }
+          <Data>
+            { renderRoutes (routes) }
+          </Data>
         </HashRouter>
       </Provider>
     )
