@@ -1,10 +1,14 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Container, TopDesc, Menu, SongList, SongItem } from './style'
 import { CSSTransition } from 'react-transition-group'
 import Header from './../../baseUI/Header/index'
 import Scroll from '../../baseUI/Scroll/index'
-import { getName, getCount } from './../../api/utils'
+import { getName, getCount, isEmptyObject } from './../../api/utils'
 import style from "../../assets/global-style"
+import { connect } from 'react-redux'
+import { getAlbumList, changeEnterLoading } from './store/actionCreators'
+import Loading from '../../baseUI/Loading/index'
+
 export const HEADER_HEIGHT = 45
 
 function Album(props) {
@@ -15,6 +19,16 @@ function Album(props) {
   const [title, setTitle] = useState ("歌单")
   const [isMarquee, setIsMarquee] = useState (false) // 是否跑马灯
   const headerEl = useRef ()
+
+  const id = props.match.params.id
+  const { currentAlbum:currentAlbumImmutable, enterLoading } = props
+  const { getAlbumDataDispatch } = props
+
+  useEffect (() => {
+    getAlbumDataDispatch (id);
+  }, [getAlbumDataDispatch, id])
+
+  let currentAlbum = currentAlbumImmutable.toJS ()
 
   const handleScroll = (pos) => {
     let minScrollY = -HEADER_HEIGHT;
@@ -33,88 +47,6 @@ function Album(props) {
       setIsMarquee (false)
     }
   }
-
-  const currentAlbum = {
-    creator: {
-      avatarUrl: "http://p1.music.126.net/O9zV6jeawR43pfiK2JaVSw==/109951164232128905.jpg",
-      nickname: "浪里推舟"
-    },
-    coverImgUrl: "http://p2.music.126.net/ecpXnH13-0QWpWQmqlR0gw==/109951164354856816.jpg",
-    subscribedCount: 2010711,
-    name: "听完就睡，耳机是天黑以后柔软的梦境",
-    tracks: [
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-      {
-        name: "我真的受伤了",
-        ar: [{ name: "张学友" }, { name: "周华健" }],
-        al: {
-          name: "学友 热"
-        }
-      },
-    ]
-  }
   return (
     <CSSTransition
       in={showStatus}
@@ -126,7 +58,7 @@ function Album(props) {
     >
       <Container>
         <Header ref={headerEl} title={title} handleClick={handleBack} isMarquee={isMarquee}></Header>
-        <Scroll bounceTop={false} onScroll={handleScroll}>
+        { !isEmptyObject (currentAlbum) ? (<Scroll bounceTop={false} onScroll={handleScroll}>
           <div>
             <TopDesc background={currentAlbum.coverImgUrl}>
               <div className="background">
@@ -199,9 +131,26 @@ function Album(props) {
             </SongList>
           </div>
         </Scroll>
+        ) : null }
+        <Loading show={enterLoading}></Loading>
       </Container>
     </CSSTransition>
   )
 }
 
-export default Album
+// 映射 Redux 全局的 state 到组件的 props 上
+const mapStateToProps = (state) => ({
+  currentAlbum: state.getIn (['album', 'currentAlbum']),
+  enterLoading: state.getIn (['album', 'enterLoading']),
+})
+// 映射 dispatch 到 props 上
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getAlbumDataDispatch (id) {
+      dispatch (changeEnterLoading (true))
+      dispatch (getAlbumList (id))
+    },
+  }
+}
+// 将 ui 组件包装成容器组件
+export default connect (mapStateToProps, mapDispatchToProps)(React.memo (Album))
