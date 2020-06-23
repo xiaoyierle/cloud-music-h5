@@ -5,30 +5,20 @@ import Header from '../../baseUI/Header'
 import Scroll from "../../baseUI/Scroll/index"
 import SongsList from "../SongsList"
 import { HEADER_HEIGHT } from "./../../api/config"
+import { connect } from 'react-redux'
+import { getSingerInfo, changeEnterLoading } from "./store/actionCreators"
+import Loading from "./../../baseUI/Loading/index"
 
 function Singer(props) {
   const [showStatus, setShowStatus] = useState(true)
-  const artist = {
-    picUrl: "https://p2.music.126.net/W__FCWFiyq0JdPtuLJoZVQ==/109951163765026271.jpg",
-    name: "薛之谦",
-    hotSongs: [
-      {
-        name: "我好像在哪见过你",
-        ar: [{ name: "薛之谦" }],
-        al: {
-          name: "薛之谦专辑"
-        }
-      },
-      {
-        name: "我好像在哪见过你",
-        ar: [{ name: "薛之谦" }],
-        al: {
-          name: "薛之谦专辑"
-        }
-      },
-      // 省略 20 条
-    ]
-  }
+  const { 
+    artist: immutableArtist, 
+    songs: immutableSongs, 
+    loading,
+  } = props
+  const { getSingerDataDispatch } = props
+  const artist = immutableArtist.toJS ()
+  const songs = immutableSongs.toJS ()
   const collectButton = useRef ()
   const imageWrapper = useRef ()
   const songScrollWrapper = useRef ()
@@ -78,6 +68,8 @@ function Singer(props) {
     }
   }, [])
   useEffect (() => {
+    const id = props.match.params.id
+    getSingerDataDispatch (id)
     let h = imageWrapper.current.offsetHeight
     songScrollWrapper.current.style.top = `${h - OFFSET}px`
     initialHeight.current = h
@@ -91,6 +83,7 @@ function Singer(props) {
     setShowStatus (false)
   }, [])
 
+  
   return (
     <CSSTransition
       in={showStatus}
@@ -113,14 +106,31 @@ function Singer(props) {
         <SongListWrapper ref={songScrollWrapper}>
           <Scroll onScroll={handleScroll} ref={songScroll}>
             <SongsList
-              songs={artist.hotSongs}
+              songs={songs}
               showCollect={false}
             ></SongsList>
           </Scroll>
         </SongListWrapper>
+        <Loading show={loading}></Loading>
       </Container>
     </CSSTransition>
   )
 }
 
-export default Singer
+// 映射 Redux 全局的 state 到组件的 props 上
+const mapStateToProps = state => ({
+  artist: state.getIn (["singerInfo", "artist"]),
+  songs: state.getIn (["singerInfo", "songsOfArtist"]),
+  loading: state.getIn (["singerInfo", "loading"]),
+})
+// 映射 dispatch 到 props 上
+const mapDispatchToProps = dispatch => {
+  return {
+    getSingerDataDispatch (id) {
+      dispatch (changeEnterLoading (true))
+      dispatch (getSingerInfo (id))
+    }
+  }
+}
+
+export default connect (mapStateToProps,mapDispatchToProps)(React.memo (Singer))
