@@ -13,7 +13,15 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>云点歌</title>
+    <title>app</title>
+    <script src="http://localhost:8080/dist/web-report.min.js"></script>
+    <script>
+      console.log(WebReport)
+      new WebReport.default({
+        token: '',
+        reportUrl: 'http://127.0.0.1:7002/api/v1/report/web'
+      })
+    </script>
   </head>
   <body>
     <div id="root"></div>
